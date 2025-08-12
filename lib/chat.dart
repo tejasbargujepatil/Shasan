@@ -27,12 +27,18 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isLoading = false;
   String extractedPdfText = ''; // Store extracted PDF text
   String currentPdfName = ''; // Store current PDF name
-  final String apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
-final String serpApiKey = dotenv.env['SERP_API_KEY'] ?? '';
-final String newsApiKey = dotenv.env['NEWS_API_KEY'] ?? '';
+  // final String apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
+  // final String serpApiKey = dotenv.env['SERP_API_KEY'] ?? '';
+  // final String newsApiKey = dotenv.env['NEWS_API_KEY'] ?? '';
+  late String apiKey;
+  late String serpApiKey;
+  late String newsApiKey;
   @override
   void initState() {
     super.initState();
+  apiKey = dotenv.env['OPENAI_API_KEY'] ?? '';
+  serpApiKey = dotenv.env['SERP_API_KEY'] ?? '';
+  newsApiKey = dotenv.env['NEWS_API_KEY'] ?? '';
     messages.add({
       'role': 'assistant',
       'text':
@@ -80,11 +86,180 @@ final String newsApiKey = dotenv.env['NEWS_API_KEY'] ?? '';
   // Check if query needs real-time information
   bool _needsRealTimeInfo(String query) {
     final realtimeKeywords = [
-      'today', 'now', 'current', 'latest', 'recent', 'this week', 'this month', 
-      'breaking', 'news', 'weather', 'stock', 'price', 'rate', 'update',
-      'happening', 'trending', 'live', '2024', '2025', 'yesterday', 'tomorrow',
-      'what time', 'date', 'when', 'status', 'ongoing', 'active'
-    ];
+  // 📅 General Time References (English) — 100+
+  'today', 'now', 'current', 'latest', 'recent', 'this week', 'this month', 'this year',
+  'breaking', 'news', 'yesterday', 'tomorrow', 'tonight', 'morning', 'afternoon', 'evening',
+  'weekend', 'midnight', 'early', 'late', 'what time', 'date', 'when', 'status', 'ongoing',
+  'active', 'instant', 'real-time', 'this morning', 'this evening', 'last night', 'just now',
+  'shortly', 'soon', 'upcoming', 'as of', 'by today', 'by tonight', 'this moment', 'next week',
+  'next month', 'next year', 'previous week', 'previous month', 'earlier today', 'later today',
+  'today evening', 'today morning', 'right now', 'at present', 'moment', 'in progress',
+  'in session', 'underway', 'as we speak', 'live now', 'currently', 'this season',
+  'this quarter', 'last week', 'last month', 'last year', 'recently', 'earlier', 'before now',
+  'after now', 'forthcoming', 'presently', 'nowadays', 'on going', 'immediately',
+  'without delay', 'timely', 'prompt', 'instantaneous', 'right away', 'ongoing now',
+  'real time', 'latest update', 'newest', 'up to date', 'breaking update', 'sudden', 'at once',
+  'quickly', 'live feed', 'live stream', 'time sensitive', 'this instant', 'up to the minute',
+  'fresh', 'current affairs', 'ongoing issue', 'at hand', 'this date', 'these days', 'on air',
+  'in the moment', 'any moment', 'time now', 'current status',
+
+  // 📊 Events & Updates (English) — 100+
+  'update', 'alert', 'headline', 'event', 'match', 'score', 'result', 'schedule', 'forecast',
+  'report', 'hot', 'viral', 'big', 'emergency', 'warning', 'advisory', 'summary', 'highlight',
+  'breaking news', 'announcement', 'latest info', 'live updates', 'situation', 'incident',
+  'accident', 'case', 'case count', 'victory', 'loss', 'draw', 'goal', 'win', 'defeat',
+  'milestone', 'record', 'achievement', 'opening', 'closing', 'inauguration', 'ceremony',
+  'speech', 'conference', 'seminar', 'meeting', 'gathering', 'strike', 'protest', 'rally',
+  'election', 'result day', 'vote count', 'poll', 'exit poll', 'ballot', 'referendum',
+  'countdown', 'timer', 'deadline', 'release', 'premiere', 'launch', 'arrival', 'departure',
+  'cancellation', 'postponed', 'rescheduled', 'announcement soon', 'rumor', 'buzz',
+  'speculation', 'confirmation', 'approval', 'agreement', 'deal', 'partnership', 'tie-up',
+  'merger', 'acquisition', 'crash', 'breakdown', 'maintenance', 'repair', 'fix', 'update log',
+  'patch', 'version', 'rollout', 'upgrade', 'newsflash', 'flash', 'emergency alert',
+  'weather warning', 'storm alert', 'breaking event', 'headline news', 'live scene', 'coverage',
+  'frontline', 'dispatch', 'reporting', 'announcement live',
+
+  // 📈 Common Real-Time Topics (English) — 100+
+  'weather', 'rain', 'storm', 'temperature', 'climate', 'heatwave', 'flood', 'earthquake',
+  'cyclone', 'tsunami', 'hail', 'snow', 'fog', 'drought', 'wildfire', 'lightning', 'thunder',
+  'stock', 'market', 'price', 'rate', 'gold', 'silver', 'currency', 'dollar', 'petrol',
+  'diesel', 'crude oil', 'sports', 'ipl', 'cricket', 'football', 'world cup', 'olympics',
+  'scorecard', 'trending', 'happening', 'live', 'playing', 'points table', 'goal update',
+  'injury report', 'team list', 'lineup', 'transfer news', 'trade', 'auction', 'bid', 'deal',
+  'entertainment', 'movie release', 'box office', 'trailer', 'music', 'concert', 'festival',
+  'holiday', 'parade', 'celebration', 'award', 'trophy', 'ceremony', 'fashion show',
+  'marathon', 'expo', 'exhibition', 'job fair', 'recruitment', 'vacancy', 'opening position',
+  'closing price', 'share market', 'nifty', 'sensex', 'bitcoin', 'crypto', 'ethereum',
+  'forex', 'exchange rate', 'loan interest', 'bank rate', 'policy rate', 'inflation',
+  'gdp', 'budget', 'tax', 'gst', 'economic update', 'finance news', 'business deal',
+  'startup news', 'funding', 'investment', 'venture capital', 'ipo', 'merger update',
+
+  // Marathi (Devanagari) — 100+  
+  'आज', 'आत्ता', 'सध्याचे', 'ताजे', 'नवीन', 'या आठवड्यात', 'या महिन्यात', 'या वर्षी',
+  'ब्रेकिंग', 'बातमी', 'काल', 'उद्या', 'आज रात्री', 'सकाळी', 'दुपारी', 'संध्याकाळी',
+  'सुट्टीचे दिवस', 'मध्यरात्री', 'लवकर', 'उशिरा', 'किती वाजता', 'तारीख', 'कधी', 'स्थिती',
+  'चालू', 'सक्रिय', 'त्वरित', 'ताज्या घडामोडी', 'सूचना', 'शीर्षक', 'कार्यक्रम', 'सामना',
+  'स्कोअर', 'निकाल', 'वेळापत्रक', 'भविष्यवाणी', 'अहवाल', 'गरम', 'व्हायरल', 'मोठी', 'आपत्कालीन',
+  'इशारा', 'सल्ला', 'ठळक बातमी', 'घोषणा', 'थेट अपडेट्स', 'परिस्थिती', 'अपघात', 'प्रकरण', 'संख्या',
+  'जिंकले', 'हारले', 'बरोबरी', 'गोल', 'जिंकणे', 'पराभव', 'मिळालेले', 'रेकॉर्ड', 'उद्घाटन',
+  'समारंभ', 'भाषण', 'बैठक', 'सभा', 'मोर्चा', 'निवडणूक', 'निकाल दिवस', 'मतमोजणी', 'मतदान',
+  'सर्वेक्षण', 'अंदाज', 'खोट्या बातम्या', 'खरे', 'अपडेट आले', 'तपासणी', 'मान्यता', 'करार',
+  'संधी', 'व्यवहार', 'भागीदारी', 'विलीनीकरण', 'खरेदी', 'अपघातस्थळ', 'हवामान इशारा',
+  'वादळ इशारा', 'पावसाचा अंदाज', 'बातमीपत्र', 'ताज्या घटना', 'बातमीदार', 'वार्ताहर',
+  'जागतिक', 'स्थानिक', 'राष्ट्रीय', 'प्रदेशिक', 'ग्रामीण', 'शहरी', 'महोत्सव', 'सण', 'सोहळा',
+
+  // Marathi in English Script — 100+  
+  'aaj', 'atta', 'sadyache', 'taje', 'navin', 'ya athavdyat', 'ya mahinyat', 'ya varshi',
+  'breaking', 'batmi', 'kal', 'udya', 'aaj ratri', 'sakali', 'dupari', 'sandhyakali',
+  'suttiche divas', 'madhyaratri', 'lavkar', 'ushira', 'kiti vajta', 'tarikh', 'kadhi',
+  'sthiti', 'chalu', 'sakriya', 'twarit', 'tajya ghadamodi', 'soochna', 'shirsak',
+  'karyakram', 'samna', 'score', 'nikal', 'velapatrak', 'bhavishyavani', 'ahwal', 'garam',
+  'viral', 'mothi', 'aaptkalin', 'ishara', 'salla', 'thalak batmi', 'ghoshna', 'thet updates',
+  'paristhiti', 'apghat', 'prakar', 'sankhya', 'jinkale', 'harle', 'barobari', 'goal',
+  'jinkane', 'parabhav', 'milalele', 'record', 'udghatan', 'samarambh', 'bhashan', 'baithak',
+  'sabha', 'morcha', 'nirvachan', 'nikal divas', 'matmojni', 'matdan', 'sarvekshan', 'andaj',
+  'kharya batmya', 'khare', 'update ale', 'tapashni', 'manyata', 'karar', 'sandhi',
+  'vyavhar', 'bhagidari', 'vilinikan', 'kharedi', 'apghatsthal', 'hawaman ishara',
+  'vadal ishara', 'pavsa cha andaj', 'batmipatra', 'tajya ghatna', 'batmidar', 'varthahar',
+  'jagatik', 'sthanik', 'rashtriya', 'pradeshik', 'grameen', 'shahari', 'mahotsav', 'san',
+  'sohala'
+
+  // General Time & Updates
+  'today', 'now', 'current', 'latest', 'recent', 'this week', 'this month',
+  'breaking', 'news', 'weather', 'stock', 'price', 'rate', 'update',
+  'happening', 'trending', 'live', '2024', '2025', 'yesterday', 'tomorrow',
+  'what time', 'date', 'when', 'status', 'ongoing', 'active',
+
+  // Government
+  'government', 'ministry', 'policy', 'scheme', 'election', 'budget',
+  'parliament', 'assembly', 'bill', 'ordinance', 'public notice', 'PMO',
+  'chief minister', 'MLA', 'MP', 'cabinet', 'gazette', 'public service',
+
+  // Judiciary & Law
+  'court', 'high court', 'supreme court', 'judgement', 'case', 'petition',
+  'legal', 'law', 'IPC', 'CrPC', 'act', 'tribunal', 'bail', 'arrest',
+  'FIR', 'chargesheet', 'warrant', 'hearing', 'order', 'justice',
+
+  // Technology
+  'AI', 'artificial intelligence', 'machine learning', 'cybersecurity',
+  'data breach', 'hack', 'software', 'app update', 'new feature',
+  'tech news', 'startup', 'IT policy', 'cloud', 'IoT', 'blockchain',
+  'crypto', '5G', 'network', 'server', 'gadget', 'device launch',
+
+  // Marathi - General
+  'आज', 'आता', 'सध्याचे', 'नवीन', 'अलीकडचे', 'या आठवड्यात',
+  'या महिन्यात', 'ताजे', 'बातमी', 'हवामान', 'शेअर', 'किंमत',
+  'दर', 'अपडेट', 'घडामोडी', 'ट्रेंडिंग', 'लाईव्ह', 'काल',
+  'उद्या', 'कधी', 'तारीख', 'स्थिती', 'चालू', 'सक्रिय',
+
+  // Marathi - Government
+  'सरकार', 'मंत्रालय', 'धोरण', 'योजना', 'निवडणूक', 'अर्थसंकल्प',
+  'संसद', 'विधानसभा', 'विधेयक', 'अधिसूचना', 'सार्वजनिक सूचना',
+  'पंतप्रधान', 'मुख्यमंत्री', 'आमदार', 'सांसद', 'मंत्रीमंडळ',
+  'राजपत्र', 'सार्वजनिक सेवा',
+
+  // Marathi - Judiciary & Law
+  'न्यायालय', 'उच्च न्यायालय', 'सर्वोच्च न्यायालय', 'निर्णय',
+  'खटला', 'याचिका', 'कायदा', 'भारतीय दंड संहिता', 'फौजदारी प्रक्रिया संहिता',
+  'कायद्याचा अधिनियम', 'न्यायाधिकरण', 'जामीन', 'अटक', 'एफआयआर',
+  'चार्जशीट', 'वॉरंट', 'सुनावणी', 'आदेश', 'न्याय',
+
+  // Marathi - Technology
+  'कृत्रिम बुद्धिमत्ता', 'यंत्र शिक्षण', 'सायबर सुरक्षा', 'डेटा गळती',
+  'हॅक', 'सॉफ्टवेअर', 'अ‍ॅप अपडेट', 'नवीन फिचर', 'तंत्रज्ञान बातम्या',
+  'स्टार्टअप', 'आयटी धोरण', 'क्लाउड', 'आयओटी', 'ब्लॉकचेन',
+  'क्रिप्टो', '५जी', 'नेटवर्क', 'सर्व्हर', 'गॅझेट', 'डिव्हाइस लाँच'
+
+  // Government & Politics
+  'government', 'parliament', 'cabinet', 'policy', 'election', 'minister',
+  'budget', 'scheme', 'bill', 'constitution', 'municipal', 'corporation',
+  'लोकसभा', 'राज्यसभा', 'सरकार', 'निवडणूक', 'मंत्री', 'आयोग', 'विधेयक',
+  'अधिनियम', 'योजना', 'राजकारण',
+
+  // Judiciary & Law
+  'court', 'supreme court', 'high court', 'tribunal', 'justice', 'judgment',
+  'case', 'petition', 'law', 'legal', 'rights', 'arrest', 'bail', 'hearing',
+  'सर्वोच्च न्यायालय', 'उच्च न्यायालय', 'न्याय', 'फैसला', 'अटक', 'जामीन', 'कायदा', 'अधिकार',
+
+  // Technology
+  'technology', 'AI', 'artificial intelligence', 'robotics', 'software',
+  'hardware', 'internet', 'cybersecurity', 'data breach', 'IT', 'startup',
+  'innovation', 'tech news', 'space', 'satellite', 'rocket launch',
+  'तंत्रज्ञान', 'कृत्रिम बुद्धिमत्ता', 'रोबोटिक्स', 'सॉफ्टवेअर', 'इंटरनेट',
+  'अंतराळ', 'उपग्रह', 'रॉकेट', 'नवोन्मेष',
+
+  // Finance & Economy
+  'finance', 'economy', 'bank', 'loan', 'interest rate', 'inflation',
+  'RBI', 'GDP', 'share market', 'crypto', 'currency', 'budget',
+  'आर्थिक', 'अर्थव्यवस्था', 'बँक', 'कर्ज', 'व्याजदर', 'महागाई', 'शेअर बाजार', 'चलन', 'क्रिप्टो',
+
+  // Education
+  'education', 'exam', 'result', 'admission', 'scholarship', 'university',
+  'college', 'school', 'board exam', 'NEET', 'JEE', 'study', 'syllabus',
+  'शिक्षण', 'परीक्षा', 'निकाल', 'प्रवेश', 'शिष्यवृत्ती', 'महाविद्यालय', 'शाळा', 'अभ्यासक्रम',
+
+  // Agriculture
+  'agriculture', 'crop', 'farmer', 'harvest', 'irrigation', 'farming',
+  'fertilizer', 'market price', 'mandi', 'monsoon', 'tractor',
+  'कृषी', 'पीक', 'शेती', 'शेतकरी', 'पिकांची कापणी', 'सिंचन', 'खते', 'बाजारभाव', 'मान्सून', 'ट्रॅक्टर',
+
+  // Health & Medicine
+  'health', 'hospital', 'doctor', 'disease', 'medicine', 'treatment',
+  'vaccine', 'covid', 'surgery', 'healthcare', 'mental health',
+  'आरोग्य', 'रुग्णालय', 'डॉक्टर', 'रोग', 'औषध', 'उपचार', 'लस', 'कोविड', 'शस्त्रक्रिया',
+
+  // Sports
+  'sports', 'cricket', 'football', 'hockey', 'tennis', 'tournament',
+  'match', 'score', 'goal', 'Olympics', 'World Cup', 'IPL',
+  'क्रीडा', 'क्रिकेट', 'फुटबॉल', 'हॉकी', 'टेनिस', 'स्पर्धा', 'सामना', 'गोल', 'ऑलिंपिक', 'वर्ल्ड कप',
+
+  // Defense & Security
+  'defense', 'army', 'navy', 'air force', 'border', 'war', 'missile',
+  'terrorism', 'cyber attack', 'spy', 'security forces', 'patrol',
+  'संरक्षण', 'लष्कर', 'नौदल', 'हवाई दल', 'सीमा', 'युद्ध', 'क्षेपणास्त्र', 'दहशतवाद', 'सायबर हल्ला', 'गुप्तहेर'
+
+];
+
     
     return realtimeKeywords.any((keyword) => 
       query.toLowerCase().contains(keyword));
@@ -730,7 +905,7 @@ Then inform the user that they can now ask specific questions about any content 
                   ),
                 ],
               ),
-            ),
+            ), 
           ],
         ),
       ),
