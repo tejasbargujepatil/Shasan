@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Indian Laws Marathi',
+                      '',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     const Icon(Icons.gavel, size: 64, color: Colors.blue),
                     const SizedBox(height: 16),
-                    Text('Welcome Back!', style: theme.textTheme.headlineSmall),
+                    Text('', style: theme.textTheme.headlineSmall),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: emailController,
@@ -177,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      'Developed By:\nInnoveda Tech Solutions \ninnoveda.com \nSource of the Information:\nhttps://www.indiancode.nic.in/\nDisclaimer:\nOur App does not represent any government entity.This app is only for Education purpose.\nTerms and Condition Apply.',
+                      'Developed By:\nInnoveda Tech Solutions \ninnoveda.co.in\nDisclaimer:\nOur App does not represent any government entity.This app is only for Education purpose.\nTerms and Condition Apply.',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 12),
                     ),
